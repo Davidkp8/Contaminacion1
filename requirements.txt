@@ -2,7 +2,4 @@ streamlit
 pandas 
 matplotlib.pyplot 
 seaborn
-geopandas
-numpy
-statsmodels.api 
-scipy.stats
+contextily
