@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import geopandas as gpd
 from shapely.geometry import Point
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
 
 # ----- Map Creator -----
 
@@ -171,6 +174,66 @@ def main():
             st.dataframe(aggregated_price)
             st.write(
                 "Note that this average takes into account only those rentals whose price is less than 500 euros.")
+
+    ### ---- Use of Methods Related to DS ----
+    if selected_page == "Use of Methods Related to DS":
+        st.header("Machine Learning Models: Price Prediction")
+
+        st.subheader("1. Data Preparation")
+        # Selecting relevant features
+        features = ['latitude', 'longitude', 'minimum_nights', 'number_of_reviews', 'reviews_per_month', 'calculated_host_listings_count', 'availability_365']
+        X = df[features]
+        y = df['price']
+
+        st.write("Selected Features:")
+        st.write(features)
+
+        st.subheader("2. Data Splitting")
+        # Splitting the data into training and testing sets
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        st.write(f"Training Set Size: {X_train.shape[0]} samples")
+        st.write(f"Testing Set Size: {X_test.shape[0]} samples")
+
+        st.subheader("3. Model Training")
+        # Training the Linear Regression model
+        model = LinearRegression()
+        model.fit(X_train, y_train)
+
+        st.write("Model Coefficients:")
+        coefficients = pd.DataFrame(model.coef_, features, columns=['Coefficient'])
+        st.write(coefficients)
+
+        st.subheader("4. Model Evaluation")
+        # Making predictions on the test set
+        y_pred = model.predict(X_test)
+
+        # Evaluating the model
+        mse = mean_squared_error(y_test, y_pred)
+        r2 = r2_score(y_test, y_pred)
+
+        st.write(f"Mean Squared Error (MSE): {mse}")
+        st.write(f"R-squared (R2): {r2}")
+
+        st.subheader("5. Results Visualization")
+        # Scatter plot of actual vs predicted prices
+        plt.figure(figsize=(10, 5))
+        plt.scatter(y_test, y_pred, alpha=0.3)
+        plt.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=2, color='red')
+        plt.xlabel('Actual Prices')
+        plt.ylabel('Predicted Prices')
+        plt.title('Actual vs Predicted Prices')
+        st.pyplot(plt.gcf())
+
+        st.subheader("Feature Importance")
+        # Bar plot of feature importances
+        plt.figure(figsize=(10, 5))
+        sns.barplot(x=coefficients.index, y='Coefficient', data=coefficients)
+        plt.title('Feature Importance')
+        plt.xlabel('Features')
+        plt.ylabel('Coefficient')
+        plt.xticks(rotation=45, ha='right')
+        st.pyplot(plt.gcf())
 
 if __name__ == "__main__":
     main()
