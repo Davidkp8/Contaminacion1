@@ -5,6 +5,4 @@ seaborn
 contextily
 geopandas
 shapely
-sklearn.model_selection
-sklearn.linear_model 
-sklearn.metrics
+sklearn
