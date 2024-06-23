@@ -12,7 +12,7 @@ def main():
     # Configuración de la página
     st.set_page_config(page_title="Alquiler Valencia")
 
-    ## Cargamos el fichero de datos y lo almacenamos en caché
+    # Cargamos el fichero de datos y lo almacenamos en caché
     @st.cache_data
     def load_data():
         return pd.read_csv(r"listings.csv")
@@ -23,18 +23,18 @@ def main():
     # Crear un widget de selección para las secciones
     with st.sidebar:
         st.header("Secciones")
-        pages = ("Airbnb en NYC", "Precios y habitaciones en NYC")
+        pages = ("Distribución de Airbnb en Valencia", "Precios y tipos de habitación en Valencia")
         selected_page = st.selectbox(
             label="Elige la sección que deseas visualizar:",
             options=pages)
 
-    ### ---- Airbnb en NYC ----
+    ### ---- Distribución de Airbnb en Valencia ----
 
-    if selected_page == "Airbnb en NYC":
-        st.header("Distribución de los alquileres en NYC")
+    if selected_page == "Distribución de Airbnb en Valencia":
+        st.header("Distribución de los alquileres en Valencia")
         st.subheader("Distribución de viviendas por barrios")
         st.write(
-            "En este gráfico vemos representadas las diferentes viviendas disponibles en Airbnb Nueva York. El color hace referencia al barrio en donde se situan.")
+            "En este gráfico se representan las diferentes viviendas disponibles en Airbnb en Valencia. El color hace referencia al barrio en donde se sitúan.")
 
         # Mapa de las viviendas por barrios
         plt.figure(figsize=(10, 10))
@@ -43,11 +43,10 @@ def main():
         sns.scatterplot(x='longitude', y='latitude', hue='neighbourhood_group', s=20, data=df)
         st.set_option('deprecation.showPyplotGlobalUse', False)
 
-
         # Añadir título y etiquetas de ejes
         plt.xlabel('Longitud')
         plt.ylabel('Latitud')
-        plt.title('Distribución Airbnb NYC')
+        plt.title('Distribución de Airbnb en Valencia')
 
         # Añadir el mapa base de OpenStreetMap utilizando contextily
         ctx.add_basemap(plt.gca(), crs='EPSG:4326', source=ctx.providers.OpenStreetMap.Mapnik)
@@ -101,10 +100,10 @@ def main():
         plt.title(f'Mapa de viviendas en {hood}')
         st.pyplot(fig)
 
-    ### ---- Precios en NYC ----
+    ### ---- Precios y tipos de habitación en Valencia ----
 
-    if selected_page == "Precios y habitaciones en NYC":
-        st.header("Análisis de los precios y tipos de habitación")
+    if selected_page == "Precios y tipos de habitación en Valencia":
+        st.header("Análisis de los precios y tipos de habitación en Valencia")
         st.subheader("Densidad y distribución de los precios por barrio")
     
         # Lista de barrios de interés
@@ -136,7 +135,7 @@ def main():
         # Creación del violinplot
     
         # Crear un sub-dataframe sin valores extremos / menores de 500
-        sub_6 = df
+        sub_6 = df[df['price'] <= 500]
         # Usar violinplot para mostrar la densidad y distribución de los precios
         plt.figure(figsize=(12, 8))  # Ajusta el tamaño de la figura para mayor legibilidad
         viz_2 = sns.violinplot(data=sub_6, x='neighbourhood_group', y='price')
@@ -176,4 +175,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
