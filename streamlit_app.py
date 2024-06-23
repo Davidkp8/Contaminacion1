@@ -178,43 +178,54 @@ def main():
     ### ---- Use of Methods Related to DS ----
     if selected_page == "Use of Methods Related to DS":
         st.header("Machine Learning Models: Price Prediction")
-
+    
         st.subheader("1. Data Preparation")
         # Selecting relevant features
         features = ['latitude', 'longitude', 'minimum_nights', 'number_of_reviews', 'reviews_per_month', 'calculated_host_listings_count', 'availability_365']
         X = df[features]
         y = df['price']
-
+    
         st.write("Selected Features:")
         st.write(features)
-
+    
+        st.subheader("1.1 Data Cleaning")
+        # Handling missing values
+        X.fillna(0, inplace=True)
+        y.fillna(0, inplace=True)
+    
+        # Checking for infinite values
+        X.replace([np.inf, -np.inf], 0, inplace=True)
+        y.replace([np.inf, -np.inf], 0, inplace=True)
+    
+        st.write("Data cleaned: missing and infinite values handled.")
+    
         st.subheader("2. Data Splitting")
         # Splitting the data into training and testing sets
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
+    
         st.write(f"Training Set Size: {X_train.shape[0]} samples")
         st.write(f"Testing Set Size: {X_test.shape[0]} samples")
-
+    
         st.subheader("3. Model Training")
         # Training the Linear Regression model
         model = LinearRegression()
         model.fit(X_train, y_train)
-
+    
         st.write("Model Coefficients:")
         coefficients = pd.DataFrame(model.coef_, features, columns=['Coefficient'])
         st.write(coefficients)
-
+    
         st.subheader("4. Model Evaluation")
         # Making predictions on the test set
         y_pred = model.predict(X_test)
-
+    
         # Evaluating the model
         mse = mean_squared_error(y_test, y_pred)
         r2 = r2_score(y_test, y_pred)
-
+    
         st.write(f"Mean Squared Error (MSE): {mse}")
         st.write(f"R-squared (R2): {r2}")
-
+    
         st.subheader("5. Results Visualization")
         # Scatter plot of actual vs predicted prices
         plt.figure(figsize=(10, 5))
@@ -224,7 +235,7 @@ def main():
         plt.ylabel('Predicted Prices')
         plt.title('Actual vs Predicted Prices')
         st.pyplot(plt.gcf())
-
+    
         st.subheader("Feature Importance")
         # Bar plot of feature importances
         plt.figure(figsize=(10, 5))
@@ -234,6 +245,7 @@ def main():
         plt.ylabel('Coefficient')
         plt.xticks(rotation=45, ha='right')
         st.pyplot(plt.gcf())
+
 
 if __name__ == "__main__":
     main()
