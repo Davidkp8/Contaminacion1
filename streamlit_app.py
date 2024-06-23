@@ -73,6 +73,7 @@ def main():
             st.write(f'El número de viviendas en {hood} es de {cantidades[hood]}')
         else:
             st.write(f'No hay datos disponibles para el barrio {hood}')
+            
         # Gráfico de barras del número de viviendas por barrio
         st.subheader("Gráfico de número de viviendas por barrio")
         plt.figure(figsize=(10, 5))
@@ -80,6 +81,7 @@ def main():
         plt.xlabel('Barrio')
         plt.ylabel('Número de viviendas')
         plt.title('Número de viviendas por barrio')
+        plt.xticks(rotation=45, ha='right')  # Rotar etiquetas del eje x
         st.pyplot()
 
         # Mapa centrado en el barrio seleccionado
