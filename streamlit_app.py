@@ -3,7 +3,8 @@ import pandas as pd
 import contextily as ctx
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import geopandas as gpd
+from shapely.geometry import Point
 
 # ----- Creador de mapas -----
 
@@ -72,6 +73,31 @@ def main():
             st.write(f'El número de viviendas en {hood} es de {cantidades[hood]}')
         else:
             st.write(f'No hay datos disponibles para el barrio {hood}')
+        # Gráfico de barras del número de viviendas por barrio
+        st.subheader("Gráfico de número de viviendas por barrio")
+        plt.figure(figsize=(10, 5))
+        sns.barplot(x='neighbourhood_group', y='count', data=neight_count)
+        plt.xlabel('Barrio')
+        plt.ylabel('Número de viviendas')
+        plt.title('Número de viviendas por barrio')
+        st.pyplot()
+
+        # Mapa centrado en el barrio seleccionado
+        st.subheader("Mapa del barrio seleccionado")
+        # Crear GeoDataFrame de las viviendas
+        geometry = [Point(xy) for xy in zip(df['longitude'], df['latitude'])]
+        geo_df = gpd.GeoDataFrame(df, geometry=geometry)
+        geo_df = geo_df.set_crs(epsg=4326)
+
+        # Filtrar datos para el barrio seleccionado
+        selected_geo_df = geo_df[geo_df['neighbourhood_group'] == hood]
+
+        # Crear el mapa
+        fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+        base = selected_geo_df.plot(ax=ax, marker='o', color='red', markersize=5)
+        ctx.add_basemap(ax, crs=geo_df.crs.to_string(), source=ctx.providers.OpenStreetMap.Mapnik)
+        plt.title(f'Mapa de viviendas en {hood}')
+        st.pyplot(fig)
 
     ### ---- Precios en NYC ----
 
@@ -108,7 +134,7 @@ def main():
         # Creación del violinplot
     
         # Crear un sub-dataframe sin valores extremos / menores de 500
-        sub_6 = df[df.price < 1000]
+        sub_6 = df
         # Usar violinplot para mostrar la densidad y distribución de los precios
         plt.figure(figsize=(12, 8))  # Ajusta el tamaño de la figura para mayor legibilidad
         viz_2 = sns.violinplot(data=sub_6, x='neighbourhood_group', y='price')
