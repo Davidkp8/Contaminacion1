@@ -6,3 +6,4 @@ contextily
 geopandas
 shapely
 scikit-learn
+numpy
