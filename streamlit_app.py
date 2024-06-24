@@ -23,7 +23,7 @@ def main():
 
     # Create a selection widget for sections at the top
     st.header("Valencia Rentals")
-    pages = ("Airbnb Distribution in Valencia", "Prices and Room Types in Valencia", "Use of Methods Related to DS")
+    pages = ("Airbnb Distribution in Valencia", "Prices and Room Types in Valencia")
     selected_page = st.selectbox(
         label="Choose the section you want to view:",
         options=pages)
