@@ -180,15 +180,15 @@ def main():
                 # Mostrar datos
         st.title("Modelo de Regresión Lineal para Predecir Precios de Viviendas en Valencia")
         st.subheader("Datos de Precios de Viviendas en Valencia")
-        st.write(data.head())
+        st.write(df.head())
         
         # Seleccionar características y columna objetivo
         # Ajusta 'feature_columns' y 'target_column' según tu archivo CSV
-        feature_columns = ['Tamaño']  # Reemplaza con tus columnas de características
-        target_column = 'Precio'  # Reemplaza con tu columna objetivo
+        feature_columns = ['room_type']  # Reemplaza con tus columnas de características
+        target_column = 'Price'  # Reemplaza con tu columna objetivo
         
-        X = data[feature_columns]
-        y = data[target_column]
+        X = df[feature_columns]
+        y = df[target_column]
         
         # Dividir en conjunto de entrenamiento y prueba
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
