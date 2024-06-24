@@ -186,6 +186,7 @@ def main():
         feature_column = 'room_type'
         target_column = 'price'
         
+        df.dropna(subset=feature_columns + [target_column], inplace=True)
         # Asegurarse de que las características categóricas estén codificadas
         #df = pd.get_dummies(df, columns=['room_type'], drop_first=True)
         
