@@ -185,7 +185,7 @@ def main():
         # Seleccionar características y columna objetivo
         # Ajusta 'feature_columns' y 'target_column' según tu archivo CSV
         feature_columns = ['room_type']  # Reemplaza con tus columnas de características
-        target_column = 'Price'  # Reemplaza con tu columna objetivo
+        target_column = 'price'  # Reemplaza con tu columna objetivo
         
         X = df[feature_columns]
         y = df[target_column]
