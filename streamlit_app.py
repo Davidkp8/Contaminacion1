@@ -177,18 +177,40 @@ def main():
 
     ### ---- Use of Methods Related to DS ----
     if selected_page == "Use of Methods Related to DS":
-                # Mostrar datos
+                        # Mostrar datos
         st.title("Modelo de Regresión Lineal para Predecir Precios de Viviendas en Valencia")
         st.subheader("Datos de Precios de Viviendas en Valencia")
         st.write(df.head())
         
         # Seleccionar características y columna objetivo
-        # Ajusta 'feature_columns' y 'target_column' según tu archivo CSV
-        feature_columns = ['room_type']  # Reemplaza con tus columnas de características
-        target_column = 'price'  # Reemplaza con tu columna objetivo
+        feature_columns = ['latitude', 'longitude', 'room_type', 'minimum_nights', 'number_of_reviews',
+                           'reviews_per_month', 'calculated_host_listings_count', 'availability_365']
+        target_column = 'price'
         
+        # Verificar que las columnas existan en el DataFrame
+        for column in feature_columns + [target_column]:
+            if column not in df.columns:
+                st.error(f"Columna no encontrada en los datos: {column}")
+                st.stop()
+        
+        # Eliminar filas con valores faltantes
+        df.dropna(subset=feature_columns + [target_column], inplace=True)
+        
+        # Asegurarse de que las características categóricas estén codificadas
+        df = pd.get_dummies(df, columns=['room_type'], drop_first=True)
+        
+        # Seleccionar las características y el objetivo
         X = df[feature_columns]
         y = df[target_column]
+        
+        # Convertir a tipo numérico por si acaso
+        X = X.apply(pd.to_numeric, errors='coerce')
+        y = pd.to_numeric(y, errors='coerce')
+        
+        # Verificar que no haya valores faltantes después de la conversión
+        if X.isnull().any().any() or y.isnull().any():
+            st.error("Existen valores faltantes en las características o en la columna objetivo después de la conversión a numérico.")
+            st.stop()
         
         # Dividir en conjunto de entrenamiento y prueba
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
@@ -207,10 +229,10 @@ def main():
         # Interfaz de Streamlit
         st.subheader("Gráfico de Datos y Modelo de Regresión")
         fig, ax = plt.subplots()
-        ax.scatter(X, y, color='blue', label='Datos Reales')
-        ax.plot(X_test, y_pred, color='red', linewidth=2, label='Modelo de Regresión')
-        ax.set_xlabel('Tamaño de la Casa')
-        ax.set_ylabel('Precio de la Casa')
+        ax.scatter(X['latitude'], y, color='blue', label='Datos Reales')
+        ax.plot(X_test['latitude'], y_pred, color='red', linewidth=2, label='Modelo de Regresión')
+        ax.set_xlabel('Latitud')
+        ax.set_ylabel('Precio')
         ax.legend()
         st.pyplot(fig)
         
@@ -219,7 +241,7 @@ def main():
         st.write(f"Coeficiente de Determinación (R^2): {r2}")
         
         st.subheader("Predicciones de Precios de Viviendas")
-        tamaño = st.slider('Selecciona el tamaño de la casa:', float(X['Tamaño'].min()), float(X['Tamaño'].max()), float(X['Tamaño'].mean()))
+        tamaño = st.slider('Selecciona el tamaño de la casa:', float(X['latitude'].min()), float(X['latitude'].max()), float(X['latitude'].mean()))
         predicción = model.predict([[tamaño]])
         st.write(f"Predicción del precio de la casa: {predicción[0]:.2f}")
 
