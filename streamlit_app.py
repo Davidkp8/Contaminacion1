@@ -177,74 +177,51 @@ def main():
 
     ### ---- Use of Methods Related to DS ----
     if selected_page == "Use of Methods Related to DS":
-        st.header("Machine Learning Models: Price Prediction")
-
-        st.subheader("1. Data Preparation")
-        # Selecting relevant features
-        features = ['latitude', 'longitude', 'minimum_nights', 'number_of_reviews', 'reviews_per_month', 'calculated_host_listings_count', 'availability_365']
-        X = df[features]
-        y = df['price']
-
-        st.write("Selected Features:")
-        st.write(features)
-
-        st.subheader("1.1 Data Cleaning")
-        # Handling missing values
-        X.fillna(0, inplace=True)
-        y.fillna(0, inplace=True)
-
-        # Checking for infinite values
-        X.replace([np.inf, -np.inf], 0, inplace=True)
-        y.replace([np.inf, -np.inf], 0, inplace=True)
-
-        st.write("Data cleaned: missing and infinite values handled.")
-
-        st.subheader("2. Data Splitting")
-        # Splitting the data into training and testing sets
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-        st.write(f"Training Set Size: {X_train.shape[0]} samples")
-        st.write(f"Testing Set Size: {X_test.shape[0]} samples")
-
-        st.subheader("3. Model Training")
-        # Training the Linear Regression model
+                # Mostrar datos
+        st.title("Modelo de Regresión Lineal para Predecir Precios de Viviendas en Valencia")
+        st.subheader("Datos de Precios de Viviendas en Valencia")
+        st.write(data.head())
+        
+        # Seleccionar características y columna objetivo
+        # Ajusta 'feature_columns' y 'target_column' según tu archivo CSV
+        feature_columns = ['Tamaño']  # Reemplaza con tus columnas de características
+        target_column = 'Precio'  # Reemplaza con tu columna objetivo
+        
+        X = data[feature_columns]
+        y = data[target_column]
+        
+        # Dividir en conjunto de entrenamiento y prueba
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+        
+        # Entrenar el modelo
         model = LinearRegression()
         model.fit(X_train, y_train)
-
-        st.write("Model Coefficients:")
-        coefficients = pd.DataFrame(model.coef_, features, columns=['Coefficient'])
-        st.write(coefficients)
-
-        st.subheader("4. Model Evaluation")
-        # Making predictions on the test set
+        
+        # Hacer predicciones
         y_pred = model.predict(X_test)
-
-        # Evaluating the model
+        
+        # Evaluar el modelo
         mse = mean_squared_error(y_test, y_pred)
         r2 = r2_score(y_test, y_pred)
-
-        st.write(f"Mean Squared Error (MSE): {mse}")
-        st.write(f"R-squared (R2): {r2}")
-
-        st.subheader("5. Results Visualization")
-        # Scatter plot of actual vs predicted prices
-        plt.figure(figsize=(10, 5))
-        plt.scatter(y_test, y_pred, alpha=0.3)
-        plt.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=2, color='red')
-        plt.xlabel('Actual Prices')
-        plt.ylabel('Predicted Prices')
-        plt.title('Actual vs Predicted Prices')
-        st.pyplot(plt.gcf())
-
-        st.subheader("Feature Importance")
-        # Bar plot of feature importances
-        plt.figure(figsize=(10, 5))
-        sns.barplot(x=coefficients.index, y='Coefficient', data=coefficients)
-        plt.title('Feature Importance')
-        plt.xlabel('Features')
-        plt.ylabel('Coefficient')
-        plt.xticks(rotation=45, ha='right')
-        st.pyplot(plt.gcf())
+        
+        # Interfaz de Streamlit
+        st.subheader("Gráfico de Datos y Modelo de Regresión")
+        fig, ax = plt.subplots()
+        ax.scatter(X, y, color='blue', label='Datos Reales')
+        ax.plot(X_test, y_pred, color='red', linewidth=2, label='Modelo de Regresión')
+        ax.set_xlabel('Tamaño de la Casa')
+        ax.set_ylabel('Precio de la Casa')
+        ax.legend()
+        st.pyplot(fig)
+        
+        st.subheader("Evaluación del Modelo")
+        st.write(f"Error Cuadrático Medio (MSE): {mse}")
+        st.write(f"Coeficiente de Determinación (R^2): {r2}")
+        
+        st.subheader("Predicciones de Precios de Viviendas")
+        tamaño = st.slider('Selecciona el tamaño de la casa:', float(X['Tamaño'].min()), float(X['Tamaño'].max()), float(X['Tamaño'].mean()))
+        predicción = model.predict([[tamaño]])
+        st.write(f"Predicción del precio de la casa: {predicción[0]:.2f}")
 
 if __name__ == "__main__":
     main()
