@@ -177,8 +177,8 @@ def main():
 
     ### ---- Use of Methods Related to DS ----
     if selected_page == "Use of Methods Related to DS":
-                                # Mostrar datos
-        st.title("Modelo de Random Forest para Predecir Precios de Viviendas en Valencia")
+                                        # Mostrar datos
+        st.title("Modelo de Regresión Ridge para Predecir Precios de Viviendas en Valencia")
         st.subheader("Datos de Precios de Viviendas en Valencia")
         st.write(df.head())
         
@@ -200,6 +200,9 @@ def main():
         # Asegurarse de que las características categóricas estén codificadas
         df = pd.get_dummies(df, columns=['room_type'], drop_first=True)
         
+        # Eliminar filas con valores NaN en las columnas seleccionadas
+        df.dropna(subset=feature_columns + [target_column], inplace=True)
+        
         # Seleccionar las características y el objetivo
         X = df[feature_columns]
         y = df[target_column]
@@ -207,8 +210,8 @@ def main():
         # Dividir en conjunto de entrenamiento y prueba
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
         
-        # Entrenar el modelo de Random Forest
-        model = RandomForestRegressor(random_state=0)
+        # Entrenar el modelo de Regresión Ridge
+        model = Ridge(alpha=1.0)  # Puedes ajustar el parámetro alpha según sea necesario
         model.fit(X_train, y_train)
         
         # Hacer predicciones
@@ -219,7 +222,7 @@ def main():
         r2 = r2_score(y_test, y_pred)
         
         # Interfaz de Streamlit
-        st.subheader("Gráfico de Datos y Modelo de Random Forest")
+        st.subheader("Gráfico de Datos y Modelo de Regresión Ridge")
         fig, ax = plt.subplots()
         ax.scatter(X['latitude'], y, color='blue', label='Datos Reales')
         ax.scatter(X_test['latitude'], y_pred, color='red', label='Predicciones')
