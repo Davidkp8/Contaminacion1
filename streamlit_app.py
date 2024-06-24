@@ -5,10 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import geopandas as gpd
 from shapely.geometry import Point
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
-import numpy as np
+
 
 # ----- Map Creator -----
 
@@ -176,98 +173,6 @@ def main():
             st.write(
                 "Note that this average takes into account only those rentals whose price is less than 500 euros.")
 
-    ### ---- Use of Methods Related to DS ----
-    if selected_page == "Use of Methods Related to DS":
-                                                # Seleccionar las columnas relevantes
-        selected_columns = ['neighbourhood_group', 'neighbourhood', 'latitude', 'longitude',
-                            'room_type', 'price', 'minimum_nights', 'number_of_reviews',
-                            'reviews_per_month', 'calculated_host_listings_count', 'availability_365']
-        
-        df = df[selected_columns]
-        
-        # Interfaz de Streamlit
-        st.title("Predicción del Precio de Alquiler en Valencia")
-        st.header("Características de la Vivienda")
-        
-        # Mostrar los primeros registros y las columnas disponibles
-        st.write(df.head())
-        st.write("Columnas disponibles en el DataFrame:")
-        st.write(df.columns)
-        
-        # Preprocesamiento de datos
-        st.subheader("Preprocesamiento de Datos")
-        st.write("Transformación logarítmica de los precios para normalizar la distribución")
-        df['log_price'] = np.log1p(df['price'])
-        
-        
-        # Filtrado de valores atípicos basado en distribución logarítmica
-        st.subheader("Filtrado de Valores Atípicos")
-        st.write("Seleccionamos únicamente los precios que están entre 3 y 8 en la escala logarítmica")
-        df_filtered = df[(df['log_price'] > 3) & (df['log_price'] < 8)]
-        
-        
-        # División en conjunto de entrenamiento y prueba
-        X = df_filtered.drop(['price', 'log_price'], axis=1)
-        y = df_filtered['log_price']
-        
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        
-        # Entrenamiento del modelo de Regresión Ridge
-        model = Ridge(alpha=1.0)  # Puedes ajustar el parámetro alpha según sea necesario
-        model.fit(X_train, y_train)
-        
-        # Evaluación del modelo
-        y_pred_train = model.predict(X_train)
-        y_pred_test = model.predict(X_test)
-        
-        mse_train = mean_squared_error(y_train, y_pred_train)
-        mse_test = mean_squared_error(y_test, y_pred_test)
-        r2_train = r2_score(y_train, y_pred_train)
-        r2_test = r2_score(y_test, y_pred_test)
-        
-        st.subheader("Resultados del Modelo de Regresión Ridge")
-        st.write(f"Error Cuadrático Medio (MSE) - Conjunto de Entrenamiento: {mse_train}")
-        st.write(f"Error Cuadrático Medio (MSE) - Conjunto de Prueba: {mse_test}")
-        st.write(f"Coeficiente de Determinación (R^2) - Conjunto de Entrenamiento: {r2_train}")
-        st.write(f"Coeficiente de Determinación (R^2) - Conjunto de Prueba: {r2_test}")
-        
-        # Interfaz para predicción de precio de alquiler
-        st.subheader("Predicción de Precio de Alquiler")
-        st.write("Ingrese las características de la vivienda para obtener una predicción")
-        
-        neighbourhood_group = st.selectbox("Distrito:", df['neighbourhood_group'].unique())
-        neighbourhood = st.selectbox("Barrio:", df['neighbourhood'].unique())
-        latitude = st.slider("Latitud:", min_value=df['latitude'].min(), max_value=df['latitude'].max())
-        longitude = st.slider("Longitud:", min_value=df['longitude'].min(), max_value=df['longitude'].max())
-        room_type = st.selectbox("Tipo de Habitación:", df['room_type'].unique())
-        minimum_nights = st.slider("Número Mínimo de Noches:", min_value=df['minimum_nights'].min(), max_value=df['minimum_nights'].max())
-        number_of_reviews = st.slider("Número de Reviews:", min_value=df['number_of_reviews'].min(), max_value=df['number_of_reviews'].max())
-        reviews_per_month = st.slider("Reviews por Mes:", min_value=df['reviews_per_month'].min(), max_value=df['reviews_per_month'].max())
-        calculated_host_listings_count = st.slider("Número de Casas Ofertadas:", min_value=df['calculated_host_listings_count'].min(), max_value=df['calculated_host_listings_count'].max())
-        availability_365 = st.slider("Disponibilidad en el Año:", min_value=df['availability_365'].min(), max_value=df['availability_365'].max())
-        
-        # Crear una nueva instancia de entrada para la predicción
-        input_data = {
-            'neighbourhood_group': neighbourhood_group,
-            'neighbourhood': neighbourhood,
-            'latitude': latitude,
-            'longitude': longitude,
-            'room_type': room_type,
-            'minimum_nights': minimum_nights,
-            'number_of_reviews': number_of_reviews,
-            'reviews_per_month': reviews_per_month,
-            'calculated_host_listings_count': calculated_host_listings_count,
-            'availability_365': availability_365
-        }
-        
-        # Realizar predicción con el modelo entrenado
-        input_df = pd.DataFrame([input_data])
-        log_price_prediction = model.predict(input_df.drop(['neighbourhood_group', 'neighbourhood', 'room_type'], axis=1))
-        
-        # Transformar la predicción de vuelta a escala original y mostrarla
-        price_prediction = np.expm1(log_price_prediction)[0]
-        st.subheader("Precio Estimado de Alquiler")
-        st.write(f"El precio estimado de alquiler es: {price_prediction:.2f} dólares")
 
 if __name__ == "__main__":
     main()
