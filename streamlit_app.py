@@ -183,14 +183,14 @@ def main():
         st.write(df.head())
         
         # Seleccionar características y columna objetivo
-        feature_columns = ['room_type']
+        feature_column = 'room_type'
         target_column = 'price'
         
         # Asegurarse de que las características categóricas estén codificadas
-        df = pd.get_dummies(df, columns=['room_type'], drop_first=True)
+        #df = pd.get_dummies(df, columns=['room_type'], drop_first=True)
         
         # Seleccionar las características y el objetivo
-        X = df[feature_columns]
+        X = df[feature_column]
         y = df[target_column]
         
         # Convertir a tipo numérico por si acaso
