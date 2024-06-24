@@ -183,18 +183,8 @@ def main():
         st.write(df.head())
         
         # Seleccionar características y columna objetivo
-        feature_columns = ['latitude', 'longitude', 'room_type', 'minimum_nights', 'number_of_reviews',
-                           'reviews_per_month', 'calculated_host_listings_count', 'availability_365']
+        feature_columns = ['room_type']
         target_column = 'price'
-        
-        # Verificar que las columnas existan en el DataFrame
-        for column in feature_columns + [target_column]:
-            if column not in df.columns:
-                st.error(f"Columna no encontrada en los datos: {column}")
-                st.stop()
-        
-        # Eliminar filas con valores faltantes
-        df.dropna(subset=feature_columns + [target_column], inplace=True)
         
         # Asegurarse de que las características categóricas estén codificadas
         df = pd.get_dummies(df, columns=['room_type'], drop_first=True)
